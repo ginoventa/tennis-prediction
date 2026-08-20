@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import pyarrow.parquet as pa 
 
 file_path = 'data-kaggle/wta.csv'
 
@@ -21,6 +22,7 @@ tennis_data_clean = tennis_data_clean.drop_duplicates()
 tennis_data_clean['Date'] = pd.to_datetime(tennis_data_clean['Date'], errors='coerce')
 tennis_data_clean['Round'] = tennis_data_clean['Round'].map(rounds).astype('Int64')
 
+tennis_data_clean['Player_1_Wins'] = (tennis_data_clean['Winner'] == tennis_data_clean['Player_1']).astype(int)
 for col in string_columns:
     tennis_data_clean[col] = tennis_data_clean[col].astype('category')
 
@@ -34,11 +36,10 @@ isSlam = tennis_data_clean['Tournament'].isin(slams)
 tennis_data_clean['isSlam'] = isSlam.astype('bool')
 
 # 4. Criação das Features e Target (y)
-tennis_data_clean['Player_1_Wins'] = (tennis_data_clean['Winner'] == tennis_data_clean['Player_1']).astype(int)
 tennis_data_clean['Rank_Diff'] = tennis_data_clean['Rank_1'] - tennis_data_clean['Rank_2']
 tennis_data_clean['Pts_Diff'] = tennis_data_clean['Pts_1'] - tennis_data_clean['Pts_2']
 tennis_data_clean['Odd_Diff'] = (tennis_data_clean['Odd_1'] - tennis_data_clean['Odd_2']).round(2)
 
 # 5. Drop final e salvamento
 tennis_data_clean = tennis_data_clean.drop(columns=['Tournament', 'Score', 'Rank_1', 'Rank_2', 'Pts_1', 'Pts_2', 'Odd_1', 'Odd_2', 'Best of'], errors='ignore')
-tennis_data_clean.to_parquet('data-kaggle/wta_clean.parquet', index=False)
+tennis_data_clean.to_parquet('data-kaggle/wta_clean.parquet', engine='pyarrow', index=False)
