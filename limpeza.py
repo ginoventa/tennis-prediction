@@ -36,8 +36,8 @@ isSlam = tennis_data_clean['Tournament'].isin(slams)
 tennis_data_clean['isSlam'] = isSlam.astype('bool')
 
 # 4. Criação das Features e Target (y)
-tennis_data_clean['Rank_Diff'] = tennis_data_clean['Rank_1'] - tennis_data_clean['Rank_2']
-tennis_data_clean['Pts_Diff'] = tennis_data_clean['Pts_1'] - tennis_data_clean['Pts_2']
+tennis_data_clean['Rank_Diff'] = tennis_data_clean['Rank_1'] - tennis_data_clean['Rank_2'].astype('Int64')
+tennis_data_clean['Pts_Diff'] = tennis_data_clean['Pts_1'] - tennis_data_clean['Pts_2'].astype('Int64')
 tennis_data_clean['Odd_Diff'] = (tennis_data_clean['Odd_1'] - tennis_data_clean['Odd_2']).round(2)
 
 # 5. Drop final e salvamento
