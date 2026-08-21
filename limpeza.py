@@ -3,6 +3,7 @@ import numpy as np
 import pyarrow.parquet as pa 
 
 file_path = 'data-kaggle/wta.csv'
+# player_name = input("Coloque o nome da jogadora que deseja analisar: ")
 
 # 1. Carregar o CSV
 tennis_data = pd.read_csv(file_path, low_memory=False)
