@@ -1,26 +1,48 @@
-#Contado apenas o ranking 
-import sklearn as sk 
+import joblib
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
-from sklearn.model_selection import train_test_split
 
-data = pd.read_parquet('data-kaggle/wta_clean.parquet')
+# 1. Carregar base limpa
+df = pd.read_parquet("data-kaggle/wta_clean.parquet")
 
-data_train = data[data["Date"] <= '2025-06-15']
-data_test = data[data["Date"] > '2025-06-15']
+# 2. Holdout
+data_train = df[df["Date"] <= "2025-04-15"].copy()
+data_test = df[df["Date"] > "2025-04-15"].copy()
 
-X_train = data_train[["Rank_Diff"]]
+# 3. Seleção dos Atributos
+features = [
+    "Rank_Diff",
+    "Pts_Diff",
+    "Odd_Diff",
+    "isSlam",
+    "Win_Rate_10_Diff",  
+    "Win_Rate_Surface_Diff",
+    "Elo_Diff",
+    "Elo_Surf_Diff",
+]
+
+X_train = data_train[features].fillna(0)
 Y_train = data_train["Player_1_Wins"]
-X_test = data_test[["Rank_Diff"]]
+
+X_test = data_test[features].fillna(0)
 Y_test = data_test["Player_1_Wins"]
 
-model = LogisticRegression()
-model.fit(X_train, Y_train) # Aprende relação entre rank-vitória 
-prediction = model.predict(X_test) # Faz predição de vitória com base no rank
+# 4. Treinar o Random Forest (CRIANDO O MODELO)
+model = RandomForestClassifier(
+    n_estimators=100,
+    max_depth=5,
+    min_samples_leaf=10,
+    random_state=42,
+    n_jobs=-1,
+)
+model.fit(X_train, Y_train)
 
-acuracia = accuracy_score(Y_test, prediction)
-print(classification_report(Y_test, prediction))
-probabilities = model.predict_proba([["Rank_Diff"]])
+# 5. Avaliar no conjunto de Teste
+y_pred = model.predict(X_test)
+print("--- DESEMPENHO NO TESTE ---")
+print(f"Acurácia: {accuracy_score(Y_test, y_pred):.4f}\n")
+print(classification_report(Y_test, y_pred))
 
-print(probabilities)
+# 6. Salva modelo treinado 
+joblib.dump(model, "data-kaggle/modelo_wta_rf.pkl")
