@@ -2,8 +2,6 @@
 
 Aplicação full-stack para prever a probabilidade de vitória em partidas WTA. O treinamento do modelo é feito em Python com scikit-learn, e a API de inferência foi implementada em C# com ASP.NET Core.
 
-O objetivo do projeto é demonstrar um fluxo completo de Machine Learning: dados históricos, criação de features, treino, avaliação, exportação do modelo e consumo por uma aplicação web.
-
 ## Fluxo do projeto
 
 ```text
@@ -36,8 +34,6 @@ O projeto usa dois grupos principais de dados:
 - `data-kaggle/wta.csv`: partidas WTA históricas, rankings, pontos, vencedora, superfície e odds.
 - `data/charting-*.csv`: estatísticas do Tennis Abstract Match Charting Project, incluindo dados agregados de saque, devolução, winners, erros não forçados e pontos.
 
-O treino processa as partidas em ordem cronológica para evitar data leakage. Isso significa que, ao criar as features de uma partida, o modelo só usa informações que já existiam antes dela.
-
 ### 2. Treinamento
 
 O arquivo `src/training/train_model.py`:
@@ -48,8 +44,6 @@ O arquivo `src/training/train_model.py`:
 - treina uma regressão logística;
 - separa treino e teste por tempo;
 - exporta `artifacts/model.json`.
-
-O modelo é propositalmente simples e interpretável. A regressão logística facilita explicar quais fatores empurraram a previsão para cada jogadora.
 
 ### 3. Artefato do modelo
 
@@ -158,15 +152,9 @@ http://localhost:5000/swagger
 
 ## Benchmark
 
-O projeto inclui um benchmark local e reprodutível:
-
-```bash
-python src/evaluation/benchmark_model.py
-```
-
 O benchmark usa o mesmo recorte temporal de teste do treinamento e compara:
 
-- nosso modelo;
+- modelo;
 - probabilidade implícita do mercado, calculada a partir de `Odd_1` e `Odd_2`;
 - baseline por ranking;
 - baseline por pontos WTA.
@@ -181,11 +169,9 @@ Baseline ranking         9054    100.0%    0.6333   0.6785   0.2301   0.6764
 Baseline pontos WTA      9054    100.0%    0.6292   0.7285   0.2357   0.6823
 ```
 
-O mercado por odds é um benchmark forte. O objetivo não é necessariamente superá-lo, mas verificar se o modelo melhora em relação a regras simples e produz probabilidades coerentes.
-
 ## Retreinamento automático
 
-A API possui um `BackgroundService` preparado para retreinar o modelo periodicamente. Ele fica desativado por padrão em `src/TennisPrediction.Api/appsettings.json`:
+A API possui um `BackgroundService` para retreinar o modelo periodicamente. Ele fica desativado por padrão em `src/TennisPrediction.Api/appsettings.json`:
 
 ```json
 {
@@ -199,11 +185,11 @@ A API possui um `BackgroundService` preparado para retreinar o modelo periodicam
 }
 ```
 
-Quando ativado, o worker chama o script Python, gera um novo `model.json` e recarrega o modelo na API se o treino terminar com sucesso.
+Quando ativado, o worker chama o script Python, gera um novo `model.json` e recarrega o modelo na API se o treino terminar com sucesso. A ideia é dar sync nisso com a atualização das tabelas de dados usadas.
 
 ## Observações
 
 - O modelo não usa odds no treinamento principal. As odds aparecem apenas no benchmark.
 - O treino evita data leakage processando as partidas em ordem cronológica.
 - As métricas podem mudar quando os datasets forem atualizados.
-- O Match Charting Project exige atribuição e uso não comercial.
+- **O Match Charting Project exige atribuição e uso não comercial.**
