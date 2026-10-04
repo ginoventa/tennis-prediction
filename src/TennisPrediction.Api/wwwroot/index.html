@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tennis Match Predictor</title>
+  <link rel="stylesheet" href="/styles.css?v=modern-1">
+</head>
+<body>
+  <main class="shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">WTA Match Outcome</p>
+        <h1>Tennis Match Predictor</h1>
+      </div>
+      <div class="header-stats" aria-label="Resumo do modelo">
+        <span><b>65%</b> Acurácia</span>
+        <span><b>9.054</b> Jogos de teste</span>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <div class="panel controls">
+        <div>
+          <p class="eyebrow">Nova Previsão</p>
+          <h2>Compare duas jogadoras:</h2>
+        </div>
+
+        <div class="player-picker" data-picker="player1">
+          <label for="player1Search">Jogadora 1</label>
+          <div class="searchbox">
+            <input id="player1Search" autocomplete="off" placeholder="Digite para buscar">
+            <button class="clear-player" type="button" aria-label="Limpar jogadora 1">×</button>
+          </div>
+          <div id="player1Options" class="player-options" role="listbox"></div>
+        </div>
+
+        <div class="player-picker" data-picker="player2">
+          <label for="player2Search">Jogadora 2</label>
+          <div class="searchbox">
+            <input id="player2Search" autocomplete="off" placeholder="Digite para buscar">
+            <button class="clear-player" type="button" aria-label="Limpar jogadora 2">×</button>
+          </div>
+          <div id="player2Options" class="player-options" role="listbox"></div>
+        </div>
+
+        <div class="row">
+          <label>
+            Piso
+            <select id="surface">
+              <option>Hard</option>
+              <option>Clay</option>
+              <option>Grass</option>
+              <option>Carpet</option>
+            </select>
+          </label>
+
+          <label>
+            Data
+            <input id="matchDate" type="date">
+          </label>
+        </div>
+
+        <button id="predictButton" type="button">Calcular previsão</button>
+        <p id="status" class="status"></p>
+      </div>
+
+      <div class="results">
+        <section class="panel score">
+          <div class="section-heading">
+            <p class="eyebrow">Probabilidade</p>
+            <h2 id="winner">Selecione duas jogadoras</h2>
+          </div>
+
+          <div class="bar" aria-hidden="true">
+            <div id="barP1"></div>
+          </div>
+
+          <div class="probabilities">
+            <div>
+              <span id="p1Name">Jogadora 1</span>
+              <strong id="p1Probability">--%</strong>
+            </div>
+            <div>
+              <span id="p2Name">Jogadora 2</span>
+              <strong id="p2Probability">--%</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid single">
+          <div class="panel power-panel">
+            <p class="eyebrow">Power Index</p>
+            <div class="power">
+              <div><span id="powerP1">--</span><small id="powerNameP1">Jogadora 1</small></div>
+              <div><span id="powerP2">--</span><small id="powerNameP2">Jogadora 2</small></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid single">
+          <div class="panel">
+            <p class="eyebrow">Principais fatores</p>
+            <ul id="drivers" class="drivers">
+              <li>A previsão aparecera aqui.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="panel features-panel">
+          <p class="eyebrow">Features calculadas</p>
+          <div id="features" class="features">
+            <div class="feature-card muted-feature">
+              <span>Execute uma previsão para ver os sinais usados pelo modelo.</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js?v=modern-1"></script>
+</body>
+</html>

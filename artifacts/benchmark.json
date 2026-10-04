@@ -1,0 +1,48 @@
+{
+  "description": "Benchmark no mesmo recorte temporal de teste usado no treinamento.",
+  "test_rows": 9054,
+  "metrics": [
+    {
+      "name": "Nosso modelo",
+      "rows": 9054,
+      "coverage": 1.0,
+      "accuracy": 0.6516,
+      "log_loss": 0.6177,
+      "brier_score": 0.2149,
+      "roc_auc": 0.7132
+    },
+    {
+      "name": "Mercado por odds",
+      "rows": 9043,
+      "coverage": 0.9988,
+      "accuracy": 0.6792,
+      "log_loss": 0.5848,
+      "brier_score": 0.2009,
+      "roc_auc": 0.7543
+    },
+    {
+      "name": "Baseline ranking",
+      "rows": 9054,
+      "coverage": 1.0,
+      "accuracy": 0.6333,
+      "log_loss": 0.6785,
+      "brier_score": 0.2301,
+      "roc_auc": 0.6764
+    },
+    {
+      "name": "Baseline pontos WTA",
+      "rows": 9054,
+      "coverage": 1.0,
+      "accuracy": 0.6292,
+      "log_loss": 0.7285,
+      "brier_score": 0.2357,
+      "roc_auc": 0.6823
+    }
+  ],
+  "notes": [
+    "Mercado por odds usa Odd_1 e Odd_2 normalizadas para remover a margem da casa.",
+    "Baselines de ranking e pontos usam funcoes logisticas heuristicas, sem treino adicional.",
+    "Log loss e brier score avaliam qualidade probabilistica; menor e melhor.",
+    "Accuracy e ROC-AUC avaliam acerto/diferenciacao; maior e melhor."
+  ]
+}
