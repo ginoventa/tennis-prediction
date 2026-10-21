@@ -12,3 +12,5 @@ build-validation/
 build-worker-validation/
 build-modern-validation/
 build-tpw-validation/
+
+dist/
