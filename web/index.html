@@ -3,125 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173c32">
+  <meta name="description" content="Compare jogadoras WTA e explore probabilidades, histórico e os fatores de cada confronto.">
   <title>Tennis Match Predictor</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+  <div class="masthead"><a class="brand" href="./"><span class="ball" aria-hidden="true"></span> TENNIS <span class="brand-light">/ PREDICTOR</span></a><span class="tour-label">WTA · MATCH INSIGHTS</span></div>
   <main class="shell">
-    <header class="app-header">
-      <div>
-        <p class="eyebrow">WTA Match Outcome</p>
-        <h1>Tennis Match Predictor</h1>
-      </div>
-      <div class="header-stats" aria-label="Resumo do modelo">
-        <span><b id="modelAccuracy">--</b> Acurácia</span>
-        <span><b id="testRows">--</b> Jogos de teste</span>
-      </div>
+    <header class="hero">
+      <div class="hero-copy"><p class="eyebrow"><span class="live-dot"></span> O jogo começa nos dados</p><h1>Um confronto.<br>Novas <em>perspectivas.</em></h1><p class="hero-description">Explore o histórico. Compare os estilos.<br>Veja o que os números dizem sobre o próximo ponto.</p></div>
+      <div class="court-art" aria-hidden="true"><div class="court"><i></i><b></b></div><span class="court-ball"></span><span class="court-caption">ADVANTAGE, DATA.</span></div>
+      <div class="header-stats" aria-label="Resumo do modelo"><div><b id="modelAccuracy">--</b><span>Acurácia no teste</span></div><div><b id="testRows">--</b><span>Partidas avaliadas</span></div><p>Histórico real.<br>Uma nova leitura do jogo.</p></div>
     </header>
-
-    <section class="workspace">
-      <div class="panel controls">
-        <div>
-          <p class="eyebrow">Nova Previsão</p>
-          <h2>Compare duas jogadoras:</h2>
-        </div>
-
-        <div class="player-picker" data-picker="player1">
-          <label for="player1Search">Jogadora 1</label>
-          <div class="searchbox">
-            <input id="player1Search" autocomplete="off" placeholder="Digite para buscar">
-            <button class="clear-player" type="button" aria-label="Limpar jogadora 1">×</button>
-          </div>
-          <div id="player1Options" class="player-options" role="listbox"></div>
-        </div>
-
-        <div class="player-picker" data-picker="player2">
-          <label for="player2Search">Jogadora 2</label>
-          <div class="searchbox">
-            <input id="player2Search" autocomplete="off" placeholder="Digite para buscar">
-            <button class="clear-player" type="button" aria-label="Limpar jogadora 2">×</button>
-          </div>
-          <div id="player2Options" class="player-options" role="listbox"></div>
-        </div>
-
-        <div class="row">
-          <label>
-            Piso
-            <select id="surface">
-              <option>Hard</option>
-              <option>Clay</option>
-              <option>Grass</option>
-              <option>Carpet</option>
-            </select>
-          </label>
-
-
-        </div>
-
-        <button id="predictButton" type="button" disabled>Calcular previsão</button>
+    <div class="workspace-heading"><p class="eyebrow">MATCH LAB</p><span>Seu próximo confronto, em detalhes</span></div>
+    <section class="workspace" aria-label="Comparação de jogadoras">
+      <section class="panel controls">
+        <div class="section-heading"><span class="section-number">01 / CONFIGURAR</span><h2>Monte o confronto</h2><p>Escolha duas jogadoras e o piso.</p></div>
+        <div class="player-picker" data-picker="player1"><label for="player1Search"><span class="player-dot"></span> Jogadora 1</label><div class="searchbox"><input id="player1Search" autocomplete="off" placeholder="Busque pelo nome" aria-controls="player1Options"><button class="clear-player" type="button" aria-label="Limpar jogadora 1">×</button></div><div id="player1Options" class="player-options" role="listbox" aria-label="Jogadoras para o primeiro lado" hidden></div></div>
+        <div class="versus"><span>VS</span></div>
+        <div class="player-picker" data-picker="player2"><label for="player2Search"><span class="player-dot second"></span> Jogadora 2</label><div class="searchbox"><input id="player2Search" autocomplete="off" placeholder="Busque pelo nome" aria-controls="player2Options"><button class="clear-player" type="button" aria-label="Limpar jogadora 2">×</button></div><div id="player2Options" class="player-options" role="listbox" aria-label="Jogadoras para o segundo lado" hidden></div></div>
+        <label class="surface-label" for="surface">Superfície<select id="surface"><option value="Hard">Hard · Quadra dura</option><option value="Clay">Clay · Saibro</option><option value="Grass">Grass · Grama</option><option value="Carpet">Carpet · Carpete</option></select></label>
+        <button id="predictButton" type="button" disabled>Explorar confronto <span aria-hidden="true">↗</span></button>
         <p id="status" class="status" role="status" aria-live="polite"></p>
-      </div>
-
-      <div class="results">
-        <section class="panel score">
-          <div class="section-heading">
-            <p class="eyebrow">Probabilidade</p>
-            <h2 id="winner">Selecione duas jogadoras</h2>
-          </div>
-
-          <div class="bar" aria-hidden="true">
-            <div id="barP1"></div>
-          </div>
-
-          <div class="probabilities">
-            <div>
-              <span id="p1Name">Jogadora 1</span>
-              <strong id="p1Probability">--%</strong>
-            </div>
-            <div>
-              <span id="p2Name">Jogadora 2</span>
-              <strong id="p2Probability">--%</strong>
-            </div>
-          </div>
-        </section>
-
-        <section class="grid single">
-          <div class="panel power-panel">
-            <p class="eyebrow">Power Index</p>
-            <div class="power">
-              <div><span id="powerP1">--</span><small id="powerNameP1">Jogadora 1</small></div>
-              <div><span id="powerP2">--</span><small id="powerNameP2">Jogadora 2</small></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="grid single">
-          <div class="panel">
-            <p class="eyebrow">Principais fatores</p>
-            <ul id="drivers" class="drivers">
-              <li>A previsão aparecera aqui.</li>
-            </ul>
-          </div>
-        </section>
-
-        <section class="panel features-panel">
-          <p class="eyebrow">Features calculadas</p>
-          <div id="features" class="features">
-            <div class="feature-card muted-feature">
-              <span>Execute uma previsão para ver os sinais usados pelo modelo.</span>
-            </div>
-          </div>
-        </section>
+        <p class="control-note">Cada confronto conta uma história.<br>Os dados ajudam a enxergar além.</p>
+      </section>
+      <div class="results" aria-live="polite" aria-atomic="true">
+        <section class="panel score"><div class="score-top"><span class="section-number">02 / PROJEÇÃO</span><span class="snapshot-badge">Histórico WTA</span></div><div class="section-heading"><p class="eyebrow">Probabilidade de vitória</p><h2 id="winner">Quem leva a vantagem?</h2><p id="resultHint">Seu confronto começa com duas escolhas.</p></div><div class="probabilities"><div><span class="player-caption">JOGADORA 01</span><strong id="p1Probability">—<small>%</small></strong><span id="p1Name">Aguardando seleção</span></div><span class="score-divider" aria-hidden="true">/</span><div><span class="player-caption">JOGADORA 02</span><strong id="p2Probability">—<small>%</small></strong><span id="p2Name">Aguardando seleção</span></div></div><div class="bar" aria-hidden="true"><div id="barP1"></div></div><div class="score-foot"><span><i class="player-dot"></i> Jogadora 1</span><span>PROJEÇÃO ESTATÍSTICA</span><span>Jogadora 2 <i class="player-dot second"></i></span></div></section>
+        <div class="insights-grid"><section class="panel power-panel"><div class="card-heading"><h3>Power Index</h3><span>35–100</span></div><p class="card-description">Força relativa neste confronto</p><div class="power"><div><span id="powerP1">—</span><small id="powerNameP1">Jogadora 1</small></div><div><span id="powerP2">—</span><small id="powerNameP2">Jogadora 2</small></div></div></section><section class="panel drivers-panel"><div class="card-heading"><h3>O que pesa no jogo</h3><span aria-hidden="true">↗</span></div><p class="card-description">Os principais fatores da previsão</p><ul id="drivers" class="drivers"><li class="empty-driver">Ranking, momento e histórico.<br>Descubra os sinais do seu confronto.</li></ul></section></div>
       </div>
     </section>
-    <footer class="panel">
-      <p id="modelInfo">Carregando informações do modelo…</p>
-      <p>Dados: <a href="https://www.tennisabstract.com/charting/meta.html">Tennis Abstract Match Charting Project</a>,
-      sob <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.
-      Uso não comercial. Adaptação dos dados para features e previsões.</p>
-    </footer>
+    <section class="panel features-panel"><div class="features-heading"><div><span class="section-number">03 / POR TRÁS DOS NÚMEROS</span><h2>Os detalhes fazem o jogo.</h2></div><p>Diferenças entre as jogadoras<br>nos indicadores do modelo.</p></div><div id="features" class="features"><div class="muted-feature"><span class="empty-mark" aria-hidden="true">↗</span><p>O confronto ainda está em aberto.<br><span>Selecione suas jogadoras para explorar os indicadores.</span></p></div></div></section>
+    <footer><div class="footer-top"><span class="footer-brand">TENNIS / PREDICTOR</span><p id="modelInfo">Carregando informações do modelo…</p></div><p>Dados: <a href="https://www.tennisabstract.com/charting/meta.html">Tennis Abstract Match Charting Project</a> · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>. Uso não comercial. Adaptação dos dados para features e previsões.</p></footer>
   </main>
-
   <script type="module" src="./app.js"></script>
 </body>
 </html>

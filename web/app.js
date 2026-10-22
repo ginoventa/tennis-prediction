@@ -11,8 +11,6 @@ const statusText = document.querySelector("#status");
 
 const selectedPlayers = new Map();
 
-
-
 async function fetchPlayers(search = "") {
   return model ? model.searchPlayers(search) : [];
 }
@@ -129,12 +127,13 @@ async function predict() {
     });
 
     const winner = data.win_probability_p1 >= data.win_probability_p2 ? data.player_1 : data.player_2;
-    document.querySelector("#winner").textContent = `Vencedora prevista: ${winner}`;
+    document.querySelector("#winner").textContent = `Vantagem: ${winner}`;
+    document.querySelector("#resultHint").textContent = `${surface.selectedOptions[0].textContent} · Probabilidades baseadas no histórico do modelo.`;
     document.querySelector("#barP1").style.width = pct(data.win_probability_p1);
     document.querySelector("#p1Name").textContent = data.player_1;
     document.querySelector("#p2Name").textContent = data.player_2;
-    document.querySelector("#p1Probability").textContent = pct(data.win_probability_p1);
-    document.querySelector("#p2Probability").textContent = pct(data.win_probability_p2);
+    document.querySelector("#p1Probability").replaceChildren(document.createTextNode(String(Math.round(data.win_probability_p1 * 100))), Object.assign(document.createElement("small"), { textContent: "%" }));
+    document.querySelector("#p2Probability").replaceChildren(document.createTextNode(String(Math.round(data.win_probability_p2 * 100))), Object.assign(document.createElement("small"), { textContent: "%" }));
     document.querySelector("#powerP1").textContent = data.power_index.player_1.toFixed(1);
     document.querySelector("#powerP2").textContent = data.power_index.player_2.toFixed(1);
     document.querySelector("#powerNameP1").textContent = data.player_1;

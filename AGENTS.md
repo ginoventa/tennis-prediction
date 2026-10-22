@@ -36,7 +36,7 @@ Follow existing formatting: four spaces in Python and C#, two spaces in JavaScri
 
 ## Testing Guidelines
 
-Run `node --test tests/model.test.mjs` for browser inference changes and `python3 scripts/build_pages.py` for site changes. The 240 preserved C# cases check parity against the current artifact; regenerate them with `tests/reference/Parity.csproj` when changing the model (see README.md). No coverage threshold is configured. Build API changes and check `/health`, player search, and valid and invalid `/predict` requests. Verify interface changes in the browser. For model changes, rerun training and benchmarking; report accuracy, log loss, Brier score, and ROC-AUC. Preserve chronological splits, prevent future-data leakage, and keep feature order and scaling consistent between Python, C#, and the browser.
+Run `node --test tests/model.test.mjs` for browser inference changes and `python3 scripts/build_pages.py` for site changes. The 240 preserved C# cases check parity against the current artifact; regenerate them with `tests/reference/Parity.csproj` when changing the model, preserving the JSON output in `tests/csharp-predictions.json`. No coverage threshold is configured. Build API changes and check `/health`, player search, and valid and invalid `/predict` requests. Verify interface changes in the browser. For model changes, rerun training and benchmarking; report accuracy, log loss, Brier score, and ROC-AUC. Preserve chronological splits, prevent future-data leakage, and keep feature order and scaling consistent between Python, C#, and the browser.
 
 ## Commit & Pull Request Guidelines
 
