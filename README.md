@@ -1,3 +1,62 @@
+# Browser release — GitHub Pages
+
+The public version lives in `web/` and runs entirely in the browser. It loads
+`artifacts/model.json` for player search, feature generation, and predictions.
+There is no hosted API, database, Python runtime, or live data feed.
+
+The original **C# application is preserved unchanged** in
+`src/TennisPrediction.Api/`, including its original frontend. It remains runnable
+with the commands below and serves as the reference implementation.
+
+## Preview locally
+
+```bash
+python3 scripts/build_pages.py
+python3 -m http.server 8000 --directory dist
+```
+
+Open `http://localhost:8000`. Use HTTP rather than opening the HTML file directly.
+The build publishes only the browser assets and model, excluding raw datasets.
+The model and its player history are publicly downloadable.
+
+## Publish on GitHub Pages
+
+1. Push these changes to the repository's `main` branch.
+2. In **Settings → Pages → Build and deployment**, select **GitHub Actions**.
+3. Open **Actions → Deploy browser app to GitHub Pages** and run the workflow,
+   or push another commit to `main`.
+4. Open the URL reported by the deployment job, normally
+   `https://<owner>.github.io/tennis-prediction/`.
+
+The workflow checks browser inference, builds `dist/`, and publishes it. Relative
+asset and model paths support the repository URL and custom domains.
+
+## Model updates and checks
+
+```bash
+node --test tests/model.test.mjs
+python3 src/training/train_model.py
+python3 src/evaluation/benchmark_model.py
+```
+
+Review benchmark changes before publishing a new model. The parity fixtures in
+`tests/csharp-predictions.json` capture predictions from the preserved C# service
+for the current artifact; regenerate them against C# when replacing that artifact.
+With the .NET 8 SDK, regenerate fixtures from the repository root:
+
+```bash
+dotnet run --project tests/reference/Parity.csproj -- "$PWD" > /tmp/tennis-csharp-output.txt
+python3 -c 'import json; from pathlib import Path; lines=Path("/tmp/tennis-csharp-output.txt").read_text().splitlines(); data=json.loads(next(s for s in reversed(lines) if s.startswith("[{"))); Path("tests/csharp-predictions.json").write_text(json.dumps(data, ensure_ascii=False, indent=2)+"\n")'
+node --test tests/model.test.mjs
+```
+
+Keep browser feature generation synchronized with `TennisModelService.cs`.
+The interface displays the model generation date and historical cutoff. The
+browser version omits the date selector because inference uses a fixed snapshot. Match Charting Project
+attribution and its noncommercial, share-alike license are displayed in the UI.
+
+---
+
 # Tennis Match Predictor
 
 Aplicação full-stack para prever a probabilidade de vitória em partidas WTA. O treinamento do modelo é feito em Python com scikit-learn, e a API de inferência foi implementada em C# com ASP.NET Core.
