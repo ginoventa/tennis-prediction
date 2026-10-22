@@ -1,16 +1,19 @@
-# Browser release — GitHub Pages
+# Tennis Match Predictor
+
+## Browser release — GitHub Pages
 
 The public version lives in `web/` and runs entirely in the browser. It loads
 `artifacts/model.json` for player search, feature generation, and predictions.
 There is no hosted API, database, Python runtime, or live data feed.
 
-The original **C# application is preserved unchanged** in
+The **C# reference application is maintained** in
 `src/TennisPrediction.Api/`, including its original frontend. It remains runnable
 with the commands below and serves as the reference implementation.
 
 ## Preview locally
 
 ```bash
+node --test tests/model.test.mjs
 python3 scripts/build_pages.py
 python3 -m http.server 8000 --directory dist
 ```
@@ -33,14 +36,16 @@ asset and model paths support the repository URL and custom domains.
 
 ## Model updates and checks
 
+Training requires the Python dependencies in `requirements.txt`; browser checks use Node.js 22.
+
 ```bash
-node --test tests/model.test.mjs
+python3 -m pip install -r requirements.txt
 python3 src/training/train_model.py
 python3 src/evaluation/benchmark_model.py
 ```
 
 Review benchmark changes before publishing a new model. The parity fixtures in
-`tests/csharp-predictions.json` capture predictions from the preserved C# service
+`tests/csharp-predictions.json` capture predictions from the C# reference service
 for the current artifact; regenerate them against C# when replacing that artifact.
 With the .NET 8 SDK, regenerate fixtures from the repository root:
 
@@ -50,6 +55,10 @@ python3 -c 'import json; from pathlib import Path; lines=Path("/tmp/tennis-cshar
 node --test tests/model.test.mjs
 ```
 
+After regenerating fixtures, run the browser tests and static build before publishing.
+Commit the updated model, benchmark, and fixtures, then redeploy Pages. C# automatic
+retraining does not update the deployed browser snapshot.
+
 Keep browser feature generation synchronized with `TennisModelService.cs`.
 The interface displays the model generation date and historical cutoff. The
 browser version omits the date selector because inference uses a fixed snapshot. Match Charting Project
@@ -57,9 +66,9 @@ attribution and its noncommercial, share-alike license are displayed in the UI.
 
 ---
 
-# Tennis Match Predictor
+## Treinamento e aplicação C# de referência
 
-Aplicação full-stack para prever a probabilidade de vitória em partidas WTA. O treinamento do modelo é feito em Python com scikit-learn, e a API de inferência foi implementada em C# com ASP.NET Core.
+O treinamento usa Python com scikit-learn e exporta um modelo compartilhado pela aplicação pública no navegador e pela API de referência em C# com ASP.NET Core.
 
 ## Fluxo do projeto
 
@@ -74,14 +83,11 @@ src/training/train_model.py
         v
 artifacts/model.json
         |
-        v
-src/TennisPrediction.Api/TennisModelService.cs
+        +--> web/model.mjs --> Interface pública no navegador (GitHub Pages)
         |
-        v
-Endpoints REST + interface web
-        |
-        v
-src/evaluation/benchmark_model.py
+        +--> src/TennisPrediction.Api/TennisModelService.cs --> API + interface de referência
+
+src/evaluation/benchmark_model.py compara o modelo com odds, ranking e pontos WTA.
 ```
 
 ## Como cada parte funciona
@@ -91,7 +97,7 @@ src/evaluation/benchmark_model.py
 O projeto usa dois grupos principais de dados:
 
 - `data-kaggle/wta.csv`: partidas WTA históricas, rankings, pontos, vencedora, superfície e odds.
-- `data/charting-*.csv`: estatísticas do Tennis Abstract Match Charting Project, incluindo dados agregados de saque, devolução, winners, erros não forçados e pontos.
+- `data/charting-w-matches.csv` e `data/charting-w-stats-Overview.csv`: metadados e estatísticas agregadas do Tennis Abstract Match Charting Project usados no treinamento atual. Os demais arquivos de `data/` são dados-fonte e documentação do projeto original.
 
 ### 2. Treinamento
 
@@ -106,7 +112,7 @@ O arquivo `src/training/train_model.py`:
 
 ### 3. Artefato do modelo
 
-O arquivo `artifacts/model.json` guarda tudo que a API precisa para prever sem depender do Python em tempo de execução:
+O arquivo `artifacts/model.json` guarda tudo que o navegador e a API precisam para prever sem depender do Python em tempo de execução:
 
 - nomes das features;
 - médias e escalas do `StandardScaler`;
@@ -115,7 +121,7 @@ O arquivo `artifacts/model.json` guarda tudo que a API precisa para prever sem d
 - métricas do treinamento;
 - dados históricos das jogadoras para inferência.
 
-Esse arquivo é o contrato entre Python e C#.
+Esse arquivo é o contrato entre Python, C# e JavaScript. O treinamento atual lê os CSVs diretamente e exporta `artifacts/model.json`.
 
 ### 4. API C#
 
@@ -129,12 +135,14 @@ Ela:
 - calcula a probabilidade com a fórmula da regressão logística;
 - retorna probabilidade, Power Index, principais fatores e snapshot das features.
 
-### 5. Interface web
+### 5. Interfaces web
+
+A interface pública em `web/` busca jogadoras e calcula previsões localmente com `web/model.mjs`, usando o histórico fixo do modelo.
 
 Os arquivos em `src/TennisPrediction.Api/wwwroot` formam uma interface simples para:
 
 - buscar jogadoras;
-- escolher superfície e data;
+- escolher superfície e preencher o campo de data legado;
 - chamar `POST /predict`;
 - exibir probabilidades, Power Index, fatores principais e features calculadas.
 
@@ -158,7 +166,9 @@ O modelo usa diferenças entre as duas jogadoras:
 - rodada;
 - indicador de Grand Slam.
 
-## Endpoints
+## Endpoints da API C#
+
+Estes endpoints pertencem à aplicação de referência; o site no GitHub Pages executa a inferência no navegador.
 
 - `GET /health`: status da API e versão do modelo.
 - `GET /players?search=iga`: lista jogadoras disponíveis.
@@ -172,12 +182,13 @@ Exemplo de request:
 {
   "player_1_id": "swiatek-i",
   "player_2_id": "sabalenka-a",
-  "surface": "Hard",
-  "match_date": "2026-10-15"
+  "surface": "Hard"
 }
 ```
 
-## Como executar
+O campo opcional `match_date` é aceito por compatibilidade, mas não altera a previsão. A inferência usa o histórico fixo e a rodada e o torneio padrão do artefato.
+
+## Como executar a referência C#
 
 Instale as dependências Python:
 
@@ -197,7 +208,7 @@ Inicie o backend C#:
 dotnet run --project src/TennisPrediction.Api
 ```
 
-Depois acesse a URL mostrada no terminal. Normalmente será algo como:
+Depois acesse a URL mostrada no terminal. Exemplo (a porta pode variar):
 
 ```text
 http://localhost:5000
@@ -218,7 +229,7 @@ O benchmark usa o mesmo recorte temporal de teste do treinamento e compara:
 - baseline por ranking;
 - baseline por pontos WTA.
 
-Resultado atual:
+Resultado registrado em `artifacts/benchmark.json`:
 
 ```text
 Modelo                   Rows Cobertura  Accuracy  LogLoss    Brier  ROC-AUC
